@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es-UY">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hackmaster — Descifra la clave (versión accesible)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;
+  --card:#f5f7fa;
+  --line:#c3d0dc;
+  --ink:#16212c;
+  --muted:#4f6377;
+  --azul:#1f5f9e;
+  --azul-hover:#17497a;
+  --azul-cl:#eaf2fa;
+  --verde:#1f6a40;
+  --verde-cl:#e3f4e9;
+  --ambar:#7a5600;
+  --ambar-cl:#fff3cc;
+  --ambar-borde:#a67c00;
+  --gris:#4f5b66;
+  --gris-cl:#eef1f4;
+  --gris-borde:#7d8a96;
+  --naranja:#a84a18;
+  --naranja-cl:#fdece1;
+  --focus:#1f5f9e;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  font-family:'Atkinson Hyperlegible','Verdana',sans-serif;
+  font-size:19px;
+  line-height:1.6;
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:2rem 1rem 4rem;
+  /* Todo en mayúsculas. El texto real queda en minúscula:
+     así el lector de pantalla y la voz leen palabras, no letras. */
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+button{font-family:inherit;text-transform:uppercase;letter-spacing:.03em}
+
+:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+
+.sr-only{
+  position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+
+.game{width:100%;max-width:620px}
+
+/* ── ENCABEZADO ─────────────────────── */
+.header{text-align:center;margin-bottom:1.5rem}
+.logo{
+  font-size:2.7rem;font-weight:700;letter-spacing:.14em;line-height:1.1;
+  color:var(--azul);
+}
+.logo span{color:var(--verde)}
+.subtitle{color:var(--muted);font-size:.95rem;margin-top:.4rem}
+
+/* ── INTERRUPTOR DE VOZ ─────────────── */
+.switch{
+  display:flex;align-items:center;gap:.8rem;
+  background:var(--azul-cl);border:2px solid var(--line);
+  border-radius:12px;padding:.8rem 1rem;margin-bottom:1.4rem;
+  cursor:pointer;min-height:60px;
+}
+.switch input{width:28px;height:28px;accent-color:var(--azul);cursor:pointer;flex-shrink:0}
+.switch .lbl{font-size:.95rem;line-height:1.45;font-weight:700}
+.switch .lbl small{display:block;color:var(--muted);font-size:.84rem;font-weight:400}
+
+/* ── MISIÓN ─────────────────────────── */
+.mision{
+  background:var(--card);border:2px solid var(--line);border-left:8px solid var(--azul);
+  border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.8rem;
+}
+h2{font-size:1.02rem;color:var(--azul);letter-spacing:.05em;line-height:1.4}
+.mision h2{margin-bottom:.7rem}
+.lineas{list-style:none;display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem}
+.lineas:last-child{margin-bottom:0}
+
+.leyenda{
+  list-style:none;display:flex;flex-direction:column;gap:.6rem;
+  border-top:2px solid var(--line);padding-top:1rem;
+}
+.leyenda li{display:flex;align-items:center;gap:.8rem;font-size:.95rem;line-height:1.45}
+.chip{
+  width:44px;height:38px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1.15rem;
+}
+
+/* Colores de las pistas: siempre con símbolo y borde distinto,
+   así no dependen solo del color */
+.chip.correct,.slot.correct{background:var(--verde-cl);border:3px solid var(--verde);color:var(--verde)}
+.chip.partial,.slot.partial{background:var(--ambar-cl);border:3px dashed var(--ambar-borde);color:var(--ambar)}
+.chip.wrong,.slot.wrong{background:var(--gris-cl);border:2px solid var(--gris-borde);color:var(--gris)}
+
+/* ── TABLERO ────────────────────────── */
+.barra{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:.7rem}
+.contador{font-weight:700;color:var(--azul);font-size:1rem}
+.board{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.8rem}
+.fila{display:flex;gap:.5rem;align-items:center}
+.num{width:1.6rem;text-align:right;font-weight:700;color:var(--muted);font-size:.9rem;flex-shrink:0}
+.slot{
+  flex:1;min-width:0;min-height:60px;
+  border-radius:10px;border:2px dashed var(--line);background:#fff;
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  font-weight:700;font-size:.95rem;color:var(--muted);
+  padding:.3rem;text-align:center;
+}
+.slot .ic{font-size:1.15rem;line-height:1}
+.resumen{min-width:3.6rem;font-weight:700;font-size:.85rem;flex-shrink:0}
+.resumen .c{color:var(--verde)}
+.resumen .p{color:var(--ambar)}
+
+/* ── INTENTO ACTUAL ─────────────────── */
+.ayuda{font-size:.92rem;color:var(--muted);margin:.3rem 0 .2rem}
+.actual{margin:.6rem 0 1.8rem}
+button.slot.lleno{
+  border:3px solid var(--azul);background:var(--azul-cl);color:var(--azul);cursor:pointer;
+}
+button.slot.lleno:hover{background:#d6e6f5}
+.slot.lleno .ic{font-size:.9rem}
+
+/* ── BANCO DE PALABRAS ──────────────── */
+.banco{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.7rem 0 1.6rem}
+.palabra{
+  min-height:64px;border-radius:12px;
+  border:2px solid var(--line);background:#fff;color:var(--ink);
+  font-size:1rem;font-weight:700;cursor:pointer;padding:.3rem;
+}
+.palabra:hover{border-color:var(--azul);color:var(--azul)}
+.palabra[aria-pressed="true"]{
+  border:3px solid var(--azul);background:var(--azul-cl);color:var(--azul);
+}
+.palabra[aria-disabled="true"]{cursor:not-allowed;background:var(--gris-cl);color:var(--muted);border-style:dashed}
+
+/* ── BOTONES ────────────────────────── */
+.acciones{display:grid;grid-template-columns:2fr 1fr 1fr;gap:.6rem;margin-bottom:1.6rem}
+.btn{
+  min-height:60px;border-radius:14px;
+  border:3px solid var(--azul);background:#fff;color:var(--azul);
+  font-size:.98rem;font-weight:700;cursor:pointer;padding:.5rem .8rem;line-height:1.3;
+}
+.btn:hover{background:var(--azul-cl)}
+.btn.primario{background:var(--azul);color:#fff}
+.btn.primario:hover{background:var(--azul-hover);border-color:var(--azul-hover)}
+.btn[aria-disabled="true"]{
+  background:var(--gris-cl);color:var(--muted);border:3px dashed var(--gris-borde);cursor:not-allowed;
+}
+
+/* ── RESULTADO ──────────────────────── */
+.resultado{border-radius:16px;padding:1.3rem 1.4rem;border:3px solid;border-top-width:10px}
+.resultado.gano{border-color:var(--verde);background:var(--verde-cl)}
+.resultado.perdio{border-color:var(--naranja);background:var(--naranja-cl)}
+.resultado h2{font-size:1.2rem;margin-bottom:.8rem}
+.resultado.gano h2{color:var(--verde)}
+.resultado.perdio h2{color:var(--naranja)}
+.clave{
+  display:inline-block;background:#fff;border:2px solid var(--line);border-radius:10px;
+  padding:.3rem .8rem;font-weight:700;font-size:1.1rem;letter-spacing:.08em;margin-top:.2rem;
+}
+.resultado .btn{width:100%;margin-top:1.1rem}
+
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+.board .fila.nueva .slot.correct{animation:pop .3s ease}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+
+/* ── MÓVIL ──────────────────────────── */
+@media (max-width:520px){
+  body{font-size:17px;padding:1.4rem .8rem 3rem}
+  .logo{font-size:2.1rem}
+  .mision{padding:1.1rem}
+  .slot{flex-direction:column;gap:.15rem;font-size:.8rem;min-height:68px}
+  .resumen{display:none}
+  .num{width:1.1rem}
+  .banco{grid-template-columns:repeat(2,1fr)}
+  .acciones{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Avisos para el lector de pantalla -->
+<div class="sr-only" aria-live="polite" id="aviso"></div>
+
+<main class="game">
+
+  <header class="header">
+    <h1 class="logo" id="titulo" tabindex="-1">Hack<span>master</span></h1>
+    <p class="subtitle">Descifra la clave. Nivel principiante.</p>
+  </header>
+
+  <label class="switch" for="voz">
+    <input type="checkbox" id="voz">
+    <span class="lbl"><span aria-hidden="true">🔊 </span>Leer todo en voz alta
+      <small>Una voz lee la misión y cada pista.</small></span>
+  </label>
+
+  <section class="mision" id="mision" aria-labelledby="t-mision">
+    <h2 id="t-mision" data-leer><span aria-hidden="true">🔐 </span>Tu misión</h2>
+    <ul class="lineas" data-leer>
+      <li>Hay una contraseña secreta.</li>
+      <li>La contraseña tiene 3 palabras.</li>
+      <li>Elige 3 palabras del banco.</li>
+      <li>Envía tu intento.</li>
+      <li> </li>
+      <li>Tienes 6 intentos para descubrirla.</li>
+      <li>Los colores te dan pistas.</li>
+    </ul>
+    <ul class="leyenda" aria-label="Qué significa cada pista" data-leer>
+      <li><span class="chip correct" aria-hidden="true">✓</span><span>Verde: la palabra está en su lugar.</span></li>
+      <li><span class="chip partial" aria-hidden="true">↔</span><span>Amarillo: la palabra está, pero en otro lugar.</span></li>
+      <li><span class="chip wrong" aria-hidden="true">✗</span><span>Gris: la palabra no está en la clave.</span></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="t-intentos">
+    <div class="barra">
+      <h2 id="t-intentos">Tus intentos</h2>
+      <p class="contador" id="contador">Usaste 0 de 6</p>
+    </div>
+    <ol class="board" id="board"></ol>
+  </section>
+
+  <section aria-labelledby="t-actual">
+    <h2 id="t-actual">Tu intento ahora</h2>
+    <p class="ayuda">Tienes <span id="n-elegidas">0</span> de 3 palabras.</p>
+    <p class="ayuda">Para quitar una palabra, tócala.</p>
+    <div class="fila actual" id="actual" role="group" aria-labelledby="t-actual"></div>
+  </section>
+
+  <section aria-labelledby="t-banco">
+    <h2 id="t-banco">Banco de palabras</h2>
+    <div class="banco" id="banco" role="group" aria-labelledby="t-banco"></div>
+  </section>
+
+  <div class="acciones">
+    <button class="btn primario" id="btn-enviar" type="button"><span aria-hidden="true">▶ </span>Enviar intento</button>
+    <button class="btn" id="btn-borrar" type="button">Borrar intento</button>
+    <button class="btn" id="btn-nueva" type="button">Jugar de nuevo</button>
+  </div>
+
+  <section class="resultado" id="resultado" hidden aria-labelledby="r-titulo">
+    <h2 id="r-titulo" tabindex="-1" data-leer></h2>
+    <div id="r-texto" data-leer></div>
+    <button class="btn primario" id="btn-otra" type="button">Jugar de nuevo</button>
+  </section>
+
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+
+/* Palabras en minúscula: se ven en mayúscula por CSS,
+   pero la voz y el lector de pantalla las leen bien */
+const PALABRAS=['robot','ninja','láser','dragón','turbo','portal','escudo','cohete'];
+const ESTADO={
+  correct:{ic:'✓', txt:'está en su lugar'},
+  partial:{ic:'↔', txt:'está, pero en otro lugar'},
+  wrong:  {ic:'✗', txt:'no está'}
+};
+
+let secreta=[], intentos=[], actual=[], fin=false;
+
+const idPalabra=w=>'p-'+w.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+/* ═══ VOZ ═══ */
+const hayVoz='speechSynthesis' in window;
+let vozAuto=false, vozES=null;
+function cargarVoz(){
+  const vs=speechSynthesis.getVoices();
+  vozES = vs.find(v=>/^es[-_](UY|AR)/i.test(v.lang)) || vs.find(v=>/^es/i.test(v.lang)) || null;
+}
+if(hayVoz){ cargarVoz(); speechSynthesis.onvoiceschanged=cargarVoz; }
+else { $('voz').closest('.switch').hidden=true; }
+
+function limpiar(t){
+  return t
+    .replace(/[\p{Extended_Pictographic}\uFE0F\u200D✓✗↔▶·]/gu,'')
+    .replace(/([.?!:])\s*\n+/g,'$1 ')
+    .replace(/\n+/g,'. ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function hablar(t){
+  if(!hayVoz || !vozAuto) return;
+  speechSynthesis.cancel();
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(limpiar(t));
+    u.lang='es-UY'; u.rate=.85;
+    if(vozES) u.voice=vozES;
+    speechSynthesis.speak(u);
+  },80);
+}
+function callar(){ if(hayVoz) speechSynthesis.cancel(); }
+
+/* Aviso para el lector de pantalla */
+function anunciar(t){
+  const a=$('aviso');
+  a.textContent='';
+  setTimeout(()=>{ a.textContent=t.replace(/\n+/g,' '); },60);
+}
+/* Aviso para las dos: lector de pantalla y voz */
+function avisar(t){ anunciar(t); hablar(t); }
+
+/* Junta el texto de los bloques marcados con data-leer, línea por línea */
+function textoDe(el){
+  const c=el.cloneNode(true);
+  c.querySelectorAll('[aria-hidden="true"]').forEach(n=>n.remove());
+  const lis=c.querySelectorAll('li');
+  if(lis.length) return [...lis].map(l=>l.textContent.trim()).join('\n');
+  return c.textContent.trim();
+}
+function leerBloque(cont){
+  return [...cont.querySelectorAll('[data-leer]')].map(textoDe).filter(Boolean).join('\n');
+}
+
+$('voz').addEventListener('change',e=>{
+  vozAuto=e.target.checked;
+  if(vozAuto) hablar('Listo. Voy a leer todo en voz alta.\n'+leerBloque($('mision')));
+  else callar();
+});
+
+/* ═══ JUEGO ═══ */
+function mezclar(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+function nuevaPartida(conAviso){
+  callar();
+  secreta=mezclar(PALABRAS).slice(0,3);
+  intentos=[]; actual=[]; fin=false;
+  const r=$('resultado');
+  r.hidden=true; r.className='resultado';
+  render();
+  if(conAviso){
+    $('titulo').focus();
+    avisar('Partida nueva.\nHay una contraseña nueva.\nTienes 6 intentos.');
+  }
+}
+
+function pistas(intento, sec){
+  const fb=['wrong','wrong','wrong'];
+  const s=[...sec], g=[...intento];
+  for(let i=0;i<3;i++){
+    if(g[i]===s[i]){ fb[i]='correct'; s[i]=null; g[i]=null; }
+  }
+  for(let i=0;i<3;i++){
+    if(g[i]!==null){
+      const k=s.indexOf(g[i]);
+      if(k!==-1){ fb[i]='partial'; s[k]=null; }
+    }
+  }
+  return fb;
+}
+
+function agregar(w){
+  if(fin) return;
+  if(actual.includes(w)){ quitar(actual.indexOf(w), true); return; }
+  if(actual.length>=3){
+    avisar('Ya tienes 3 palabras.\nEnvía tu intento o quita una palabra.');
+    return;
+  }
+  actual.push(w);
+  render();
+  avisar('Elegiste '+w+'. Lugar '+actual.length+'.'+(actual.length===3?'\nYa puedes enviar tu intento.':''));
+}
+
+function quitar(i, desdeBanco){
+  if(fin) return;
+  const w=actual[i];
+  actual.splice(i,1);
+  render();
+  avisar('Quitaste '+w+'.');
+  if(!desdeBanco){
+    const s=$('lugar-'+i) || $('lugar-'+(i-1));
+    (s || $(idPalabra(w))).focus();
+  }
+}
+
+function borrar(){
+  if(fin) return;
+  if(!actual.length){ avisar('Tu intento ya está vacío.'); return; }
+  actual=[];
+  render();
+  avisar('Borraste tu intento.\nElige 3 palabras otra vez.');
+}
+
+function enviar(){
+  if(fin) return;
+  if(actual.length!==3){
+    const f=3-actual.length;
+    avisar(f===1 ? 'Te falta 1 palabra.' : 'Te faltan '+f+' palabras.');
+    return;
+  }
+  const fb=pistas(actual, secreta);
+  intentos.push({palabras:[...actual], fb});
+  const n=intentos.length;
+  const texto='Intento '+n+'.\n'+actual.map((w,j)=>w+': '+ESTADO[fb[j]].txt+'.').join('\n');
+  const gano=fb.every(f=>f==='correct');
+  actual=[];
+
+  if(gano || n>=6){
+    fin=true;
+    render();
+    mostrarResultado(gano, texto);
+  } else {
+    render();
+    const quedan=6-n;
+    avisar(texto+'\n'+(quedan===1?'Te queda 1 intento.':'Te quedan '+quedan+' intentos.'));
+  }
+}
+
+function mostrarResultado(gano, textoIntento){
+  const n=intentos.length;
+  const clave='<span class="clave">'+secreta.join(' · ')+'</span>';
+  const ganar=[
+    ['¡Genio total!', 'Lo lograste en 1 intento.\nEres una leyenda.'],
+    ['¡Increíble!', 'Lo lograste en 2 intentos.\nPiensas como una computadora.'],
+    ['¡Muy bien!', 'Lo lograste en 3 intentos.\nMisión cumplida.'],
+    ['¡Bien hecho!', 'Lo lograste en 4 intentos.\nEl sistema se abrió.'],
+    ['¡Lo lograste!', 'Usaste 5 intentos.\nEstuvo cerca.'],
+    ['¡En el último intento!', 'Usaste los 6 intentos.\nPero entraste.']
+  ];
+  let titulo, lineas;
+  const r=$('resultado');
+  if(gano){
+    [titulo, lineas]=ganar[n-1];
+    r.className='resultado gano';
+  } else {
+    titulo='Acceso denegado.';
+    lineas='Usaste los 6 intentos.\nEsta vez el sistema no se abrió.\nPrueba otra vez.';
+    r.className='resultado perdio';
+  }
+  $('r-titulo').textContent=titulo;
+  $('r-texto').innerHTML='<ul class="lineas">'
+    + lineas.split('\n').map(l=>'<li>'+l+'</li>').join('')
+    + '<li>La contraseña era: '+clave+'</li></ul>';
+  r.hidden=false;
+  anunciar(textoIntento);
+  $('r-titulo').focus();
+  hablar(textoIntento+'\n'+leerBloque(r));
+}
+
+/* ═══ DIBUJAR ═══ */
+function renderTablero(){
+  const b=$('board');
+  b.innerHTML='';
+  for(let i=0;i<6;i++){
+    const li=document.createElement('li');
+    li.className='fila';
+    const g=intentos[i];
+    let h='<span class="num" aria-hidden="true">'+(i+1)+'</span>';
+    if(g){
+      if(i===intentos.length-1) li.classList.add('nueva');
+      h+='<span class="sr-only">Intento '+(i+1)+':</span>';
+      g.palabras.forEach((w,j)=>{
+        const e=ESTADO[g.fb[j]];
+        h+='<span class="slot '+g.fb[j]+'"><span class="ic" aria-hidden="true">'+e.ic+'</span><span>'+w+'</span><span class="sr-only">: '+e.txt+'.</span></span>';
+      });
+      const c=g.fb.filter(f=>f==='correct').length;
+      const p=g.fb.filter(f=>f==='partial').length;
+      h+='<span class="resumen" aria-hidden="true"><span class="c">'+c+' ✓</span> <span class="p">'+p+' ↔</span></span>';
+    } else {
+      li.setAttribute('aria-hidden','true');
+      for(let j=0;j<3;j++) h+='<span class="slot"><span>—</span></span>';
+      h+='<span class="resumen"></span>';
+    }
+    li.innerHTML=h;
+    b.appendChild(li);
+  }
+}
+
+function renderActual(){
+  const a=$('actual');
+  a.innerHTML='<span class="num" aria-hidden="true"></span>';
+  for(let i=0;i<3;i++){
+    const w=actual[i];
+    if(w){
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='slot lleno';
+      b.id='lugar-'+i;
+      b.innerHTML='<span>'+w+'</span><span class="ic" aria-hidden="true">✕</span>';
+      b.setAttribute('aria-label','Lugar '+(i+1)+': '+w+'. Quitar.');
+      b.onclick=()=>quitar(i,false);
+      a.appendChild(b);
+    } else {
+      const s=document.createElement('span');
+      s.className='slot';
+      s.innerHTML='<span aria-hidden="true">'+(i+1)+'</span><span class="sr-only">Lugar '+(i+1)+': vacío.</span>';
+      a.appendChild(s);
+    }
+  }
+  a.insertAdjacentHTML('beforeend','<span class="resumen" aria-hidden="true"></span>');
+}
+
+/* El banco se arma una sola vez: así el foco no se pierde al elegir */
+function armarBanco(){
+  const banco=$('banco');
+  PALABRAS.forEach(w=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='palabra';
+    b.id=idPalabra(w);
+    b.textContent=w;
+    b.onclick=()=>agregar(w);
+    banco.appendChild(b);
+  });
+}
+
+function render(){
+  $('contador').textContent='Usaste '+intentos.length+' de 6';
+  $('n-elegidas').textContent=actual.length;
+  renderTablero();
+  renderActual();
+  PALABRAS.forEach(w=>{
+    const b=$(idPalabra(w));
+    b.setAttribute('aria-pressed', actual.includes(w)?'true':'false');
+    b.setAttribute('aria-disabled', fin?'true':'false');
+  });
+  $('btn-enviar').setAttribute('aria-disabled', (actual.length!==3 || fin)?'true':'false');
+  $('btn-borrar').setAttribute('aria-disabled', (!actual.length || fin)?'true':'false');
+}
+
+$('btn-enviar').onclick=enviar;
+$('btn-borrar').onclick=borrar;
+$('btn-nueva').onclick=()=>nuevaPartida(true);
+$('btn-otra').onclick=()=>nuevaPartida(true);
+
+armarBanco();
+nuevaPartida(false);
+</script>
+</body>
+</html>
