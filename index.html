@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hackmaster — Descifra la clave (versión accesible)</title>
+<title>Hackmaster — Descubre la clave (versión accesible)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -88,12 +88,23 @@ h2{font-size:1.02rem;color:var(--azul);letter-spacing:.05em;line-height:1.4}
 .mision h2{margin-bottom:.7rem}
 .lineas{list-style:none;display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.1rem}
 .lineas:last-child{margin-bottom:0}
+.lineas li{display:flex;align-items:flex-start;gap:.55rem;flex-wrap:wrap}
+.lineas li .l{display:block}
+.lineas li .emo{flex-shrink:0;width:1.6rem;text-align:center}
+.lineas li:has(.l + .l){display:grid;grid-template-columns:1.6rem 1fr;column-gap:.55rem}
+.lineas li:has(.l + .l) .l{grid-column:2}
+.lineas li.sin-emo{padding-left:2.15rem}
+.lineas li.destacado{font-weight:700;font-size:1.05rem}
+.logo .emo{letter-spacing:0}
 
 .leyenda{
   list-style:none;display:flex;flex-direction:column;gap:.6rem;
   border-top:2px solid var(--line);padding-top:1rem;
 }
-.leyenda li{display:flex;align-items:center;gap:.8rem;font-size:.95rem;line-height:1.45}
+.leyenda li{display:grid;grid-template-columns:auto 1fr;column-gap:.9rem;align-items:start;font-size:.95rem;line-height:1.45}
+.leyenda li .chip{grid-row:span 3}
+.leyenda li .l{display:block;grid-column:2}
+.leyenda li strong{font-size:1rem}
 .chip{
   width:44px;height:38px;border-radius:8px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
@@ -201,41 +212,41 @@ button.slot.lleno:hover{background:#d6e6f5}
 <main class="game">
 
   <header class="header">
-    <h1 class="logo" id="titulo" tabindex="-1">Hack<span>master</span></h1>
-    <p class="subtitle">Descifra la clave. Nivel principiante.</p>
+    <h1 class="logo" id="titulo" tabindex="-1"><span class="emo" aria-hidden="true">🔐 </span>Hack<span>master</span></h1>
+    <p class="subtitle">Descubre la clave</p>
   </header>
 
   <label class="switch" for="voz">
     <input type="checkbox" id="voz">
     <span class="lbl"><span aria-hidden="true">🔊 </span>Leer todo en voz alta
-      <small>Una voz lee la misión y cada pista.</small></span>
+      <small>Una voz lee la misión y cada intento.</small></span>
   </label>
 
   <section class="mision" id="mision" aria-labelledby="t-mision">
-    <h2 id="t-mision" data-leer><span aria-hidden="true">🔐 </span>Tu misión</h2>
+    <h2 id="t-mision" data-leer><span aria-hidden="true">🎯 </span>Tu misión</h2>
     <ul class="lineas" data-leer>
-      <li>Hay una contraseña secreta.</li>
-      <li>La contraseña tiene 3 palabras.</li>
-      <li>Elige 3 palabras del banco.</li>
-      <li>Envía tu intento.</li>
-      <li> </li>
-   
+      <li class="destacado"><span class="emo" aria-hidden="true">🔒</span><span class="l">Hay una clave secreta.</span></li>
+      <li class="sin-emo"><span class="l">La clave tiene 3 palabras.</span></li>
     </ul>
-    <ul class="leyenda" aria-label="Qué significa cada pista" data-leer>
-       <li>Los colores te dan pistas.</li>
-      <li>Tienes 6 intentos para descubrirla.</li>
-      <li><span class="chip correct" aria-hidden="true">✓</span><span>Verde: la palabra está en su lugar.</span></li>
-      <li><span class="chip partial" aria-hidden="true">↔</span><span>Amarillo: la palabra está, pero en otro lugar.</span></li>
-      <li><span class="chip wrong" aria-hidden="true">✗</span><span>Gris: la palabra no está en la clave.</span></li>
-         
-     
+    <ul class="lineas" data-leer>
+      <li><span class="emo" aria-hidden="true">👉</span><span class="l">Elige 3 palabras del banco.</span></li>
+      <li><span class="emo" aria-hidden="true">👉</span><span class="l">Envía tu respuesta.</span></li>
+      <li><span class="emo" aria-hidden="true">👉</span><span class="l">Tienes 6 intentos.</span></li>
+    </ul>
+    <ul class="lineas" data-leer>
+      <li><span class="emo" aria-hidden="true">👀</span><span class="l">Mira los colores.</span><span class="l">Te ayudan a descubrir la clave.</span></li>
+    </ul>
+    <ul class="leyenda" aria-label="Qué significa cada color" data-leer>
+      <li><span class="chip correct" aria-hidden="true">✓</span><strong class="l"><span aria-hidden="true">🟢 </span>Verde</strong><span class="l">La palabra está bien.</span><span class="l">Está en el lugar correcto.</span></li>
+      <li><span class="chip partial" aria-hidden="true">↔</span><strong class="l"><span aria-hidden="true">🟡 </span>Amarillo</strong><span class="l">La palabra está en la clave.</span><span class="l">Pero está en otro lugar.</span></li>
+      <li><span class="chip wrong" aria-hidden="true">✗</span><strong class="l"><span aria-hidden="true">⚪ </span>Gris</strong><span class="l">La palabra no está en la clave.</span></li>
     </ul>
   </section>
 
   <section aria-labelledby="t-intentos">
     <div class="barra">
-      <h2 id="t-intentos">Tus intentos</h2>
-      <p class="contador" id="contador">Usaste 0 de 6</p>
+      <h2 id="t-intentos"><span aria-hidden="true">🎮 </span>Tus intentos</h2>
+      <p class="contador" id="contador">Intento 1 de 6</p>
     </div>
     <ol class="board" id="board"></ol>
   </section>
@@ -253,7 +264,7 @@ button.slot.lleno:hover{background:#d6e6f5}
   </section>
 
   <div class="acciones">
-    <button class="btn primario" id="btn-enviar" type="button"><span aria-hidden="true">▶ </span>Enviar intento</button>
+    <button class="btn primario" id="btn-enviar" type="button"><span aria-hidden="true">▶ </span>Enviar respuesta</button>
     <button class="btn" id="btn-borrar" type="button">Borrar intento</button>
     <button class="btn" id="btn-nueva" type="button">Jugar de nuevo</button>
   </div>
@@ -273,9 +284,9 @@ const $=id=>document.getElementById(id);
    pero la voz y el lector de pantalla las leen bien */
 const PALABRAS=['robot','ninja','láser','dragón','turbo','portal','escudo','cohete'];
 const ESTADO={
-  correct:{ic:'✓', txt:'está en su lugar'},
-  partial:{ic:'↔', txt:'está, pero en otro lugar'},
-  wrong:  {ic:'✗', txt:'no está'}
+  correct:{ic:'✓', txt:'está bien, en el lugar correcto'},
+  partial:{ic:'↔', txt:'está en la clave, pero en otro lugar'},
+  wrong:  {ic:'✗', txt:'no está en la clave'}
 };
 
 let secreta=[], intentos=[], actual=[], fin=false;
@@ -326,7 +337,10 @@ function textoDe(el){
   const c=el.cloneNode(true);
   c.querySelectorAll('[aria-hidden="true"]').forEach(n=>n.remove());
   const lis=c.querySelectorAll('li');
-  if(lis.length) return [...lis].map(l=>l.textContent.trim()).join('\n');
+  if(lis.length) return [...lis].map(l=>{
+    const ps=[...l.querySelectorAll('.l')].map(x=>x.textContent.trim()).filter(Boolean);
+    return ps.length ? ps.join('\n') : l.textContent.trim();
+  }).join('\n');
   return c.textContent.trim();
 }
 function leerBloque(cont){
@@ -351,7 +365,7 @@ function nuevaPartida(conAviso){
   render();
   if(conAviso){
     $('titulo').focus();
-    avisar('Partida nueva.\nHay una contraseña nueva.\nTienes 6 intentos.');
+    avisar('Partida nueva.\nHay una clave nueva.\nTienes 6 intentos.');
   }
 }
 
@@ -374,12 +388,12 @@ function agregar(w){
   if(fin) return;
   if(actual.includes(w)){ quitar(actual.indexOf(w), true); return; }
   if(actual.length>=3){
-    avisar('Ya tienes 3 palabras.\nEnvía tu intento o quita una palabra.');
+    avisar('Ya tienes 3 palabras.\nEnvía tu respuesta o quita una palabra.');
     return;
   }
   actual.push(w);
   render();
-  avisar('Elegiste '+w+'. Lugar '+actual.length+'.'+(actual.length===3?'\nYa puedes enviar tu intento.':''));
+  avisar('Elegiste '+w+'. Lugar '+actual.length+'.'+(actual.length===3?'\nYa puedes enviar tu respuesta.':''));
 }
 
 function quitar(i, desdeBanco){
@@ -451,7 +465,7 @@ function mostrarResultado(gano, textoIntento){
   $('r-titulo').textContent=titulo;
   $('r-texto').innerHTML='<ul class="lineas">'
     + lineas.split('\n').map(l=>'<li>'+l+'</li>').join('')
-    + '<li>La contraseña era: '+clave+'</li></ul>';
+    + '<li>La clave era: '+clave+'</li></ul>';
   r.hidden=false;
   anunciar(textoIntento);
   $('r-titulo').focus();
@@ -526,7 +540,7 @@ function armarBanco(){
 }
 
 function render(){
-  $('contador').textContent='Usaste '+intentos.length+' de 6';
+  $('contador').textContent='Intento '+(fin ? intentos.length : Math.min(intentos.length+1,6))+' de 6';
   $('n-elegidas').textContent=actual.length;
   renderTablero();
   renderActual();
